@@ -1,37 +1,54 @@
 import jwt from 'jsonwebtoken';
+import * as Yup from 'yup';
 import authConfig from '../../config/auth';
+import User from '../models/User';
 
 class SessionController {
   async login(req, res) {
-    const { login: username, password } = req.body;
+    const { password, email } = req.body;
 
-    // For the given username fetch user from DB
-    const mockedUsername = 'julio';
-    const mockedPassword = '1234';
+    const schema = Yup.object().shape({
+      name: Yup.string().required(),
+      email: Yup.string()
+        .email()
+        .required(),
+      password: Yup.string()
+        .required()
+        .min(6),
+    });
 
-    if (username && password) {
-      if (username === mockedUsername && password === mockedPassword) {
-        const token = jwt.sign({ username }, authConfig.secret, {
-          expiresIn: '24h',
-        });
-        // return the JWT token for the future API calls
-        res.json({
-          success: true,
-          message: 'Authentication successful!',
-          token,
-        });
-      } else {
-        res.status(403).json({
-          success: false,
-          message: 'Incorrect username or password',
-        });
-      }
-    } else {
-      res.status(400).json({
-        success: false,
-        message: 'Authentication failed! Please check the request',
-      });
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails' });
     }
+
+    const user = await User.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    if (!(await user.checkPassword(password))) {
+      return res.status(401).json({ error: 'Password does not match' });
+    }
+
+    const { id, name } = user;
+
+    return res.json({
+      user: {
+        id,
+        name,
+        email,
+      },
+      token: jwt.sign(
+        {
+          id,
+        },
+        authConfig.secret,
+        { expiresIn: authConfig.expiresIn }
+      ),
+    });
   }
 }
 
