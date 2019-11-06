@@ -18,7 +18,7 @@ const sessionAuthorization = (req, res, next) => {
         });
       }
       req.decoded = decoded;
-      next();
+      return next();
     });
   } else {
     return res.json({
