@@ -2,7 +2,7 @@ import * as Yup from 'yup';
 import Student from '../models/Student';
 
 class StudentController {
-  async getAll(req, res) {
+  async index(req, res) {
     const student = await Student.findAll();
     return res.json(student);
   }
