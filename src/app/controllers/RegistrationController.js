@@ -56,12 +56,22 @@ class RegistrationController {
       return res.status(404).json({ error: 'Validation fails' });
     }
 
-    const registration = await Registration.create(req.body);
+    const registration = await Registration.create(req.body, {
+      include: [
+        {
+          model: Student,
+          as: 'student',
+        },
+        {
+          model: Plan,
+          as: 'plan',
+        },
+      ],
+    });
 
     const plan = await Plan.findByPk(registration.plan_id);
     const student = await Student.findByPk(registration.student_id);
 
-    registration.plan = plan;
     // await Queue.add(RegistrationMail.key, {
     //   registration,
     // });
