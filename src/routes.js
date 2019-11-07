@@ -7,6 +7,7 @@ import StudentController from './app/controllers/StudentController';
 import SessionController from './app/controllers/SessionController';
 import UserController from './app/controllers/UserController';
 import PlansController from './app/controllers/PlanController';
+import RegistrationController from './app/controllers/RegistrationController';
 
 import authMiddlewares from './app/middlewares/auth';
 
@@ -17,7 +18,9 @@ routes.get('/users/:id', UserController.getById);
 routes.post('/users', UserController.store);
 routes.post('/login', SessionController.login);
 
+// auth
 routes.use(authMiddlewares);
+
 routes.get('/users', UserController.index);
 routes.put('/users/:id', UserController.update);
 
@@ -29,6 +32,11 @@ routes.put('/plans/:id', PlansController.update);
 routes.delete('/plans/:id', PlansController.delete);
 routes.post('/plans', PlansController.store);
 routes.get('/plans', PlansController.index);
+
+routes.put('/registration/:id', RegistrationController.update);
+routes.delete('/registration/:id', RegistrationController.delete);
+routes.post('/registration', RegistrationController.store);
+routes.get('/registration', RegistrationController.index);
 
 routes.post('/files', upload.single('file'), FileController.store);
 
