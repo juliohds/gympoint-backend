@@ -2,7 +2,7 @@ import { subDays } from 'date-fns';
 import { Op } from 'sequelize';
 import Checkin from '../models/Checkin';
 
-class CheckinController {
+class HelpOrdersController {
   async index(req, res) {
     const { id: student_id } = req.params;
 
@@ -42,4 +42,4 @@ class CheckinController {
   }
 }
 
-export default new CheckinController();
+export default new HelpOrdersController();
