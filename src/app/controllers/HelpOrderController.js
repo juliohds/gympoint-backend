@@ -1,5 +1,3 @@
-import { subDays } from 'date-fns';
-import { Op } from 'sequelize';
 import HelpOrder from '../models/HelpOrder';
 
 class HelpOrderController {
@@ -14,29 +12,24 @@ class HelpOrderController {
 
   async store(req, res) {
     const { id: student_id } = req.params;
-
-    if (!student_id) {
-      return res.status(404).json({ error: 'Student id is missing' });
+    const { question } = req.body;
+    if (!question) {
+      return res.status(404).json({ error: 'Question is missing' });
     }
 
-    const todayDate = new Date();
-    const last7DaysDate = subDays(new Date(), 7);
+    const helpOrder = await HelpOrder.create({ student_id, question });
+    return res.json(helpOrder);
+  }
 
-    const checkinCount = await HelpOrder.findAndCountAll({
-      where: {
-        student_id,
-        createdAt: {
-          [Op.between]: [last7DaysDate, todayDate],
-        },
-      },
-    });
-
-    if (checkinCount.count >= 5) {
-      return res.status(404).json({ error: 'Max 5 checkins in the week' });
+  async answer(req, res) {
+    const { id } = req.params;
+    const { answer } = req.body;
+    if (!answer) {
+      return res.status(404).json({ error: 'Answer is missing' });
     }
-
-    const checkin = await HelpOrder.create({ student_id });
-    return res.json(checkin);
+    const helpOrder = await HelpOrder.findByPk(id);
+    await helpOrder.update({ answer, answer_at: new Date() });
+    return res.json(helpOrder);
   }
 }
 
