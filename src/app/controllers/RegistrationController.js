@@ -2,12 +2,13 @@ import * as Yup from 'yup';
 import Registration from '../models/Registration';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
-import RegistrationMail from '../jobs/RegistrationMail';
-import Queue from '../../lib/Queue';
+// import RegistrationMail from '../jobs/RegistrationMail';
+// import Queue from '../../lib/Queue';
 
 class RegistrationController {
   async index(req, res) {
     const registrations = await Registration.findAll({
+      attributes: ['id', 'start_date', 'end_date', 'price', 'active'],
       include: [
         {
           model: Student,
@@ -69,8 +70,8 @@ class RegistrationController {
       ],
     });
 
-    const plan = await Plan.findByPk(registration.plan_id);
-    const student = await Student.findByPk(registration.student_id);
+    // const plan = await Plan.findByPk(registration.plan_id);
+    // const student = await Student.findByPk(registration.student_id);
 
     // await Queue.add(RegistrationMail.key, {
     //   registration,
